@@ -1,0 +1,44 @@
+{
+  "name": "richard-speed-race",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon",
+    "build": "rimraf build && tsc",
+    "start": "npm run build && node build/server.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Derick1530/rich-speed-race.git"
+  },
+  "keywords": [],
+  "author": "derickzihalirwa07@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Derick1530/rich-speed-race/issues"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "module-alias": "^2.2.3",
+    "socket.io": "^4.7.1",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.3.3",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.0",
+    "rimraf": "^5.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
+  "_moduleAliases": {
+    "@/data": "./build/data",
+    "@/lib": "./build/lib",
+    "@/types": "./build/types"
+  },
+  "homepage": "https://github.com/Derick1530/rich-speed-race#readme"
+}

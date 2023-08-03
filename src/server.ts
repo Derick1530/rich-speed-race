@@ -6,9 +6,12 @@ import http from 'http'
 import cors from 'cors'
 import { z } from 'zod'
 
-import type { JoinRoomData } from '@/types'
+import type { JoinRoomData, Message, MessagePayload } from '@/types'
 import { joinRoomSchema } from './lib/joinRoom'
 import { addUser, getRoomMembers, getUser, removeUser } from './data/user'
+import { v4 as uuidv4 } from 'uuid'
+import { formatDate } from './util/date'
+import { addMessage, getRoomMessages } from './data/message'
 
 const app = express()
 
@@ -52,6 +55,8 @@ function joinRoom(socket: Socket, roomId: string, username: string) {
   })
 }
 
+function sendMessage(socket: Socket, roomId: string, message: string) {}
+
 function leaveRoom(socket: Socket) {
   const user = getUser(socket.id)
   if (!user) return
@@ -92,6 +97,35 @@ io.on('connection', socket => {
     socket.emit('room-not-found', {
       message: "Oops! The Room ID you entered doesn't exist or hasn't been created yet.",
     })
+  })
+
+  socket.on('send-message', ({ roomId, data, type }: MessagePayload) => {
+    const sender = getUser(socket.id)
+    console.log('Check', roomId, sender, data)
+    if (!sender) return
+
+    const messageObj = {
+      id: uuidv4(),
+      type,
+      sender,
+      data,
+      createdAt: formatDate(Date.now()),
+    } as Message
+
+    addMessage(messageObj, roomId)
+    io.to(roomId).emit('receive-message', messageObj)
+  })
+
+  socket.on('client-ready', (roomId: string) => {
+    const members = getRoomMembers(roomId)
+    // Don't need to request the room's canvas state if a user is the first member
+    if (members.length === 1) return socket.emit('client-loaded')
+
+    const adminMember = members[0]
+
+    if (!adminMember) return
+
+    socket.to(adminMember.id).emit('get-canvas-state')
   })
 
   socket.on('leave-room', () => {

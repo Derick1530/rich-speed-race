@@ -15,7 +15,7 @@ export type Message = {
 } & {
   id: string
   sender: User
-  createdAt: string
+  createdAt: Date
 }
 
 export interface Messages {

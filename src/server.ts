@@ -10,7 +10,6 @@ import type { JoinRoomData, Message, MessagePayload } from '@/types'
 import { joinRoomSchema } from './lib/joinRoom'
 import { addUser, getRoomMembers, getUser, removeUser } from './data/user'
 import { v4 as uuidv4 } from 'uuid'
-import { formatDate } from './util/date'
 import { addMessage, getRoomMessages } from './data/message'
 
 const app = express()
@@ -18,6 +17,7 @@ const app = express()
 app.use(cors())
 
 const server = http.createServer(app)
+const now = new Date()
 
 const io = new Server(server)
 
@@ -54,8 +54,6 @@ function joinRoom(socket: Socket, roomId: string, username: string) {
     message: `${username} joined the party.`,
   })
 }
-
-function sendMessage(socket: Socket, roomId: string, message: string) {}
 
 function leaveRoom(socket: Socket) {
   const user = getUser(socket.id)
@@ -101,7 +99,6 @@ io.on('connection', socket => {
 
   socket.on('send-message', ({ roomId, data, type }: MessagePayload) => {
     const sender = getUser(socket.id)
-    console.log('Check', roomId, sender, data)
     if (!sender) return
 
     const messageObj = {
@@ -109,7 +106,7 @@ io.on('connection', socket => {
       type,
       sender,
       data,
-      createdAt: formatDate(Date.now()),
+      createdAt: now,
     } as Message
 
     addMessage(messageObj, roomId)
